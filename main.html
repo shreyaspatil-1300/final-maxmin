@@ -407,7 +407,7 @@
                         <tr><th>Sign change of f'(x)</th><th>Nature of Point</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>+ → -</td><td>Local Maximum</td>｜｜DSML｜｜
+                        <tr><td>+ → -</td><td>Local Maximum</td></tr>
                         <tr><td>- → +</td><td>Local Minimum</td></tr>
                         <tr><td>No sign change</td><td>Neither (inflection point)</td></tr>
                     </tbody>
@@ -851,8 +851,8 @@
         let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th></tr>`;
         points.forEach(p => {
             tableHtml += `<tr><td>(${p.x.toFixed(4)}, ${p.y.toFixed(4)})</td>
-                          <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
-                          <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
+                           <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
+                           <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
         });
         tableHtml += `</table>`;
         if (points.length === 0) tableHtml = "<i>No critical points data available</i>";
