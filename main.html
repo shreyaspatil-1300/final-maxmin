@@ -371,7 +371,7 @@
     <!-- ===================== HOME PANEL - COMPLETE THEORY ===================== -->
     <div id="home-panel" class="panel active-panel">
         <div class="card">
-            <h2><i class="fas fa-book-open"></i> Maxima and Minima </h2>
+            <h2><i class="fas fa-book-open"></i> Maxima and Minima – Complete Theory</h2>
             <div class="theory-content">
                 <h3>Introduction</h3>
                 <p>Maxima and Minima is an important topic in Differential Calculus that deals with finding the greatest and smallest values of a function. These concepts are widely used in mathematics, physics, engineering, economics, optimization problems, and real-life applications.</p>
@@ -478,7 +478,7 @@
             </div>
         </div>
         
-        <!-- Embed YouTube Video at the bottom of Home page -->
+        <!-- YouTube Video -->
         <div class="card">
             <div class="video-wrapper">
                 <h3><i class="fab fa-youtube"></i> One Shot Video: Maxima & Minima (Full Revision)</h3>
@@ -530,7 +530,7 @@
         </div>
     </div>
 
-    <!-- QUIZ PANEL (20 questions + detailed solutions) -->
+    <!-- QUIZ PANEL (20 questions) -->
     <div id="quiz-panel" class="panel">
         <div class="card">
             <h2><i class="fas fa-brain"></i> 20 Theory Questions</h2>
@@ -541,7 +541,7 @@
         </div>
     </div>
 
-    <!-- FEEDBACK PANEL WITH EMAIL INTEGRATION -->
+    <!-- FEEDBACK PANEL WITH EMAIL -->
     <div id="feedback-panel" class="panel">
         <div class="card">
             <h2><i class="fas fa-comment"></i> We value your feedback</h2>
@@ -565,111 +565,255 @@
 </div>
 
 <script>
-    // ----------------------------------- GLOBAL STATE --------------------------------
-    // ✅ SET YOUR EMAIL ADDRESS HERE (replace with your actual email)
-    const ADMIN_EMAIL = "shreyas.patil25@pccoepune.org";   // <---- CHANGE THIS TO YOUR EMAIL
+    // ---------------------------- EMAIL CONFIGURATION ----------------------------
+    // 👇 CHANGE THIS TO YOUR EMAIL ADDRESS
+    const ADMIN_EMAIL = "your-email@example.com";
 
+    // ---------------------------- GLOBAL STATE ----------------------------
     let currentFuncStr = "x^3 - 3*x*y^2";
     let criticalPoints = [];
 
-    // Helper math functions
+    // ---------------------------- HELPER FUNCTIONS ----------------------------
     function compileFunction(funcStr) {
-        try { const node = math.parse(funcStr); return (x,y) => node.evaluate({x,y}); } catch(e) { return null; }
+        try {
+            const node = math.parse(funcStr);
+            return (x,y) => node.evaluate({x,y});
+        } catch(e) { return null; }
     }
-    function getDerivative(funcStr, variable) {
-        try { return math.derivative(math.parse(funcStr), variable).toString(); } catch(e) { return null; }
-    }
-    function evalDerivative(derivStr, x, y) {
-        if(!derivStr) return NaN;
-        try { return math.parse(derivStr).evaluate({x,y}); } catch(e) { return NaN; }
-    }
-    function refineCriticalPoint(funcStr, x0, y0) {
-        let fx = getDerivative(funcStr, 'x'), fy = getDerivative(funcStr, 'y');
-        let x=x0, y=y0;
-        for(let iter=0; iter<8; iter++) {
-            let fxv = evalDerivative(fx, x, y), fyv = evalDerivative(fy, x, y);
-            if(Math.abs(fxv)<1e-6 && Math.abs(fyv)<1e-6) break;
-            x -= fxv*0.12; y -= fyv*0.12;
-        }
-        return {x,y};
-    }
-    function findCriticalPoints(funcStr, range=[-2.6,2.6], step=0.14) {
-        let fxD = getDerivative(funcStr,'x'), fyD = getDerivative(funcStr,'y');
-        if(!fxD || !fyD) return [];
-        let candidates = [];
-        let steps = Math.floor((range[1]-range[0])/step);
-        for(let i=0;i<=steps;i++) for(let j=0;j<=steps;j++) {
-            let x0 = range[0]+i*step, y0 = range[0]+j*step;
-            if(Math.abs(evalDerivative(fxD,x0,y0))<0.045 && Math.abs(evalDerivative(fyD,x0,y0))<0.045)
-                candidates.push(refineCriticalPoint(funcStr,x0,y0));
-        }
-        let unique = [];
-        for(let c of candidates) if(!unique.some(u=>Math.hypot(u.x-c.x,u.y-c.y)<0.12) && isFinite(c.x) && isFinite(c.y)) unique.push(c);
-        let r2 = getDerivative(getDerivative(funcStr,'x'),'x');
-        let s2 = getDerivative(getDerivative(funcStr,'x'),'y');
-        let t2 = getDerivative(getDerivative(funcStr,'y'),'y');
-        for(let p of unique) {
-            let r_val = evalDerivative(r2,p.x,p.y), s_val = evalDerivative(s2,p.x,p.y), t_val = evalDerivative(t2,p.x,p.y);
-            let D = r_val*t_val - s_val*s_val;
-            let type = (D>0 && r_val>0) ? "Minimum" : (D>0 && r_val<0) ? "Maximum" : (D<0) ? "Saddle Point" : "Inconclusive";
-            p.r = r_val; p.s = s_val; p.t = t_val; p.D = D; p.type = type;
-        }
-        return unique.filter(p=>!isNaN(p.r));
-    }
-    function evalFuncSafe(funcStr,x,y) { try { return math.parse(funcStr).evaluate({x,y}); } catch(e) { return NaN; } }
 
+    function getDerivativeString(funcStr, variable) {
+        try {
+            return math.derivative(math.parse(funcStr), variable).toString();
+        } catch(e) { return null; }
+    }
+
+    function evalDerivative(derivStr, x, y) {
+        if (!derivStr) return NaN;
+        try {
+            return math.parse(derivStr).evaluate({x,y});
+        } catch(e) { return NaN; }
+    }
+
+    // Finite difference approximation for safety
+    function gradFD(f, x, y, h=1e-6) {
+        let fx = (f(x+h, y) - f(x-h, y)) / (2*h);
+        let fy = (f(x, y+h) - f(x, y-h)) / (2*h);
+        return [fx, fy];
+    }
+
+    // Refine a critical point using Newton-like method (gradient descent)
+    function refineCriticalPoint(f, fxStr, fyStr, x0, y0, tol=1e-6, maxIter=30) {
+        let x = x0, y = y0;
+        for (let iter = 0; iter < maxIter; iter++) {
+            let fx = evalDerivative(fxStr, x, y);
+            let fy = evalDerivative(fyStr, x, y);
+            if (isNaN(fx) || isNaN(fy)) {
+                // fallback to FD
+                let [gx, gy] = gradFD(f, x, y);
+                fx = gx; fy = gy;
+            }
+            let norm = Math.hypot(fx, fy);
+            if (norm < tol) break;
+            // simple gradient descent with adaptive step
+            let step = Math.min(0.1, norm * 0.5);
+            x -= fx * step;
+            y -= fy * step;
+            // clamp to reasonable bounds
+            x = Math.min(Math.max(x, -8), 8);
+            y = Math.min(Math.max(y, -8), 8);
+        }
+        return {x, y};
+    }
+
+    // Main critical point finder – adaptive grid + refinement
+    function findCriticalPoints(funcStr, f_eval, rangeMin=-4, rangeMax=4, step=0.2) {
+        let fxStr = getDerivativeString(funcStr, 'x');
+        let fyStr = getDerivativeString(funcStr, 'y');
+        if (!fxStr || !fyStr) return [];
+
+        let candidates = [];
+        // coarse grid search
+        for (let x = rangeMin; x <= rangeMax + 1e-9; x += step) {
+            for (let y = rangeMin; y <= rangeMax + 1e-9; y += step) {
+                let fx = evalDerivative(fxStr, x, y);
+                let fy = evalDerivative(fyStr, x, y);
+                if (isNaN(fx) || isNaN(fy)) {
+                    let [gx, gy] = gradFD(f_eval, x, y);
+                    fx = gx; fy = gy;
+                }
+                if (Math.abs(fx) < 0.1 && Math.abs(fy) < 0.1) {
+                    let refined = refineCriticalPoint(f_eval, fxStr, fyStr, x, y);
+                    candidates.push(refined);
+                }
+            }
+        }
+
+        // deduplicate
+        let unique = [];
+        for (let c of candidates) {
+            let duplicate = unique.some(u => Math.hypot(u.x - c.x, u.y - c.y) < 0.1);
+            if (!duplicate && isFinite(c.x) && isFinite(c.y)) unique.push(c);
+        }
+
+        // second derivatives for classification
+        let r2Str = getDerivativeString(getDerivativeString(funcStr, 'x'), 'x');
+        let s2Str = getDerivativeString(getDerivativeString(funcStr, 'x'), 'y');
+        let t2Str = getDerivativeString(getDerivativeString(funcStr, 'y'), 'y');
+
+        for (let p of unique) {
+            let r = evalDerivative(r2Str, p.x, p.y);
+            let s = evalDerivative(s2Str, p.x, p.y);
+            let t = evalDerivative(t2Str, p.x, p.y);
+            if (isNaN(r) || isNaN(s) || isNaN(t)) {
+                // use finite difference for second derivatives
+                let h = 1e-5;
+                let f = f_eval;
+                let fxx = (f(p.x+h, p.y) - 2*f(p.x, p.y) + f(p.x-h, p.y)) / (h*h);
+                let fyy = (f(p.x, p.y+h) - 2*f(p.x, p.y) + f(p.x, p.y-h)) / (h*h);
+                let fxy = (f(p.x+h, p.y+h) - f(p.x+h, p.y-h) - f(p.x-h, p.y+h) + f(p.x-h, p.y-h)) / (4*h*h);
+                r = fxx; s = fxy; t = fyy;
+            }
+            let D = r * t - s * s;
+            let type = (D > 0 && r > 0) ? "Minimum" :
+                       (D > 0 && r < 0) ? "Maximum" :
+                       (D < 0) ? "Saddle Point" : "Inconclusive";
+            p.r = r; p.s = s; p.t = t; p.D = D; p.type = type;
+        }
+        return unique;
+    }
+
+    function evalFuncSafe(funcStr, x, y) {
+        try {
+            return math.parse(funcStr).evaluate({x,y});
+        } catch(e) { return NaN; }
+    }
+
+    // ---------------------------- UI UPDATE FUNCTIONS ----------------------------
     function computeAll() {
         let raw = document.getElementById("functionInput").value;
         currentFuncStr = raw;
-        if(!compileFunction(currentFuncStr)) { document.getElementById("criticalPointsOutput").innerHTML="Invalid function."; return; }
-        criticalPoints = findCriticalPoints(currentFuncStr);
-        let r2 = getDerivative(getDerivative(currentFuncStr,'x'),'x');
-        let s2 = getDerivative(getDerivative(currentFuncStr,'x'),'y');
-        let t2 = getDerivative(getDerivative(currentFuncStr,'y'),'y');
-        document.getElementById("derivativeOutput").innerHTML = `<strong>Second derivatives:</strong> r = ${r2||'?'}, s = ${s2||'?'}, t = ${t2||'?'}<br> D = rt - s²`;
-        if(criticalPoints.length===0) document.getElementById("criticalPointsOutput").innerHTML = "No critical points found.";
-        else {
-            let html = `<strong>Critical points (${criticalPoints.length}):</strong><br>`;
-            criticalPoints.forEach(p=>{ html+=`<div class="point-badge ${p.type==='Maximum'?'max-point':(p.type==='Minimum'?'min-point':'saddle-point')}">(${p.x.toFixed(4)},${p.y.toFixed(4)}) → ${p.type} | D=${p.D?.toFixed(4)}</div>`; });
+        let f = compileFunction(currentFuncStr);
+        if (!f) {
+            document.getElementById("criticalPointsOutput").innerHTML = "❌ Invalid function syntax. Use variables x and y.";
+            return;
+        }
+        // Automatic range detection: try broader range if needed
+        let points = findCriticalPoints(currentFuncStr, f, -5, 5, 0.22);
+        if (points.length === 0) {
+            // try even larger range
+            points = findCriticalPoints(currentFuncStr, f, -7, 7, 0.28);
+        }
+        criticalPoints = points;
+
+        // Show symbolic second derivatives
+        let r2 = getDerivativeString(getDerivativeString(currentFuncStr, 'x'), 'x');
+        let s2 = getDerivativeString(getDerivativeString(currentFuncStr, 'x'), 'y');
+        let t2 = getDerivativeString(getDerivativeString(currentFuncStr, 'y'), 'y');
+        document.getElementById("derivativeOutput").innerHTML = `<strong>Second derivatives:</strong><br>
+        r = ∂²f/∂x² = ${r2 || '?'}<br>
+        s = ∂²f/∂x∂y = ${s2 || '?'}<br>
+        t = ∂²f/∂y² = ${t2 || '?'}<br>
+        D = r·t − s² (evaluated at each critical point)`;
+
+        if (criticalPoints.length === 0) {
+            document.getElementById("criticalPointsOutput").innerHTML = "⚠️ No critical points found. Try a different function or adjust domain.";
+        } else {
+            let html = `<strong>🔍 Critical points (${criticalPoints.length} found):</strong><br>`;
+            criticalPoints.forEach(p => {
+                html += `<div class="point-badge ${p.type === 'Maximum' ? 'max-point' : (p.type === 'Minimum' ? 'min-point' : 'saddle-point')}">
+                        (${p.x.toFixed(5)}, ${p.y.toFixed(5)}) → ${p.type} | D = ${p.D?.toFixed(5)}</div>`;
+            });
             document.getElementById("criticalPointsOutput").innerHTML = html;
         }
         updateResultAnalysis(criticalPoints);
         updateContourPlot(currentFuncStr, criticalPoints);
         update3DSurface(currentFuncStr, criticalPoints);
     }
+
     function updateResultAnalysis(points) {
-        let summary = `<strong>Classification (D = rt-s²):</strong><br>`;
-        if(points.length===0) summary += "No critical points.";
-        else points.forEach(p=>{
-            let cond = (p.type==="Minimum")?`D>0, r>0 → Min`:(p.type==="Maximum")?`D>0, r<0 → Max`:(p.type==="Saddle Point")?`D<0 → Saddle`:`D=0 inconclusive`;
-            summary+=`<div><span class="point-badge">(${p.x.toFixed(3)},${p.y.toFixed(3)})</span> — ${cond}</div>`;
-        });
+        let summary = `<strong>📊 Classification summary (D = rt - s²):</strong><br>`;
+        if (points.length === 0) {
+            summary += "No critical points to analyze.";
+        } else {
+            points.forEach(p => {
+                let cond = "";
+                if (p.type === "Minimum") cond = `D = ${p.D.toFixed(5)} > 0, r = ${p.r.toFixed(5)} > 0 → Local Minimum`;
+                else if (p.type === "Maximum") cond = `D = ${p.D.toFixed(5)} > 0, r = ${p.r.toFixed(5)} < 0 → Local Maximum`;
+                else if (p.type === "Saddle Point") cond = `D = ${p.D.toFixed(5)} < 0 → Saddle Point`;
+                else cond = `D = ${p.D.toFixed(5)} = 0 → Inconclusive`;
+                summary += `<div style="margin-top:8px;"><span class="point-badge">(${p.x.toFixed(4)}, ${p.y.toFixed(4)})</span> — ${cond}</div>`;
+            });
+        }
         document.getElementById("analysisSummary").innerHTML = summary;
-        let table = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point</th><th>r</th><th>s</th><th>t</th><th>D</th><th>Type</th></tr>`;
-        points.forEach(p=>{ table+=`<tr><td>(${p.x.toFixed(3)},${p.y.toFixed(3)})</td><td>${p.r.toFixed(4)}</td><td>${p.s.toFixed(4)}</td><td>${p.t.toFixed(4)}</td><td>${p.D.toFixed(4)}</td><td>${p.type}</td></tr>`; });
-        table+=`</table>`;
-        document.getElementById("detailedTable").innerHTML = points.length?table:"No data";
-    }
-    function updateContourPlot(funcStr, points) {
-        let xv=[], yv=[], zv=[];
-        for(let x=-2.4; x<=2.4; x+=0.18) for(let y=-2.4; y<=2.4; y+=0.18) { let z=evalFuncSafe(funcStr,x,y); if(isFinite(z)){ xv.push(x); yv.push(y); zv.push(z); } }
-        let trace = {x:xv, y:yv, z:zv, type:'contour', colorscale:'Viridis'};
-        let shapes = [];
-        points.forEach(p=>{ let col = p.type==='Maximum'?'#ef4444':(p.type==='Minimum'?'#10b981':'#f59e0b'); shapes.push({type:'circle', xref:'x', yref:'y', x0:p.x-0.08, x1:p.x+0.08, y0:p.y-0.08, y1:p.y+0.08, line:{color:col,width:3}, fillcolor:col}); });
-        let layout = { title:'Contour with critical points', shapes, paper_bgcolor:'#fff', plot_bgcolor:'#f8fafc' };
-        Plotly.newPlot('contourPlot', [trace], layout, {responsive:true});
-    }
-    function update3DSurface(funcStr, points) {
-        let xa=[], ya=[], zmat=[]; let steps=48, rng=[-2.2,2.2];
-        for(let i=0;i<=steps;i++){ let x=rng[0]+(i/steps)*(rng[1]-rng[0]); let row=[]; for(let j=0;j<=steps;j++){ let y=rng[0]+(j/steps)*(rng[1]-rng[0]); row.push(evalFuncSafe(funcStr,x,y)); if(i===0) ya.push(y); } xa.push(x); zmat.push(row); }
-        let surf = {x:xa, y:ya, z:zmat, type:'surface', colorscale:[[0,'#2563eb'],[0.5,'#2dd4bf'],[1,'#dc2626']], opacity:0.85};
-        let markers = [];
-        points.forEach(p=>{ let zval = evalFuncSafe(funcStr,p.x,p.y); let col = p.type==='Maximum'?'#dc2626':(p.type==='Minimum'?'#10b981':'#f97316'); markers.push({x:[p.x], y:[p.y], z:[zval], mode:'markers', type:'scatter3d', marker:{size:7, color:col, symbol:'circle'}, name:p.type}); });
-        let layout = { title:'3D surface', scene: { camera: { eye: { x:1.4, y:1.3, z:1.2 } } }, paper_bgcolor:'#fff' };
-        Plotly.newPlot('surface3d', [surf, ...markers], layout, {responsive:true});
+
+        let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th></tr>`;
+        points.forEach(p => {
+            tableHtml += `<tr><td>(${p.x.toFixed(4)}, ${p.y.toFixed(4)})</td>
+                         <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
+                         <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
+        });
+        tableHtml += `</table>`;
+        if (points.length === 0) tableHtml = "<i>No critical points data available</i>";
+        document.getElementById("detailedTable").innerHTML = tableHtml;
     }
 
-    // 20 QUIZ QUESTIONS (unchanged)
+    function updateContourPlot(funcStr, points) {
+        let xv = [], yv = [], zv = [];
+        for (let x = -3; x <= 3.01; x += 0.2) {
+            for (let y = -3; y <= 3.01; y += 0.2) {
+                let z = evalFuncSafe(funcStr, x, y);
+                if (isFinite(z)) { xv.push(x); yv.push(y); zv.push(z); }
+            }
+        }
+        let trace = { x: xv, y: yv, z: zv, type: 'contour', colorscale: 'Viridis', contours: { coloring: 'heatmap' } };
+        let shapes = [];
+        points.forEach(p => {
+            let col = p.type === 'Maximum' ? '#ef4444' : (p.type === 'Minimum' ? '#10b981' : '#f59e0b');
+            shapes.push({
+                type: 'circle', xref: 'x', yref: 'y',
+                x0: p.x - 0.08, x1: p.x + 0.08, y0: p.y - 0.08, y1: p.y + 0.08,
+                line: { color: col, width: 3 }, fillcolor: col
+            });
+        });
+        let layout = { title: 'Contour Map (critical points highlighted)', shapes, paper_bgcolor: '#fff', plot_bgcolor: '#f8fafc' };
+        Plotly.newPlot('contourPlot', [trace], layout, { responsive: true });
+    }
+
+    function update3DSurface(funcStr, points) {
+        let xa = [], ya = [], zmat = [];
+        let steps = 50, rng = [-2.5, 2.5];
+        for (let i = 0; i <= steps; i++) {
+            let x = rng[0] + (i / steps) * (rng[1] - rng[0]);
+            let row = [];
+            for (let j = 0; j <= steps; j++) {
+                let y = rng[0] + (j / steps) * (rng[1] - rng[0]);
+                row.push(evalFuncSafe(funcStr, x, y));
+                if (i === 0) ya.push(y);
+            }
+            xa.push(x);
+            zmat.push(row);
+        }
+        let surface = {
+            x: xa, y: ya, z: zmat, type: 'surface',
+            colorscale: [[0, '#2563eb'], [0.5, '#2dd4bf'], [1, '#dc2626']], opacity: 0.85
+        };
+        let markers = [];
+        points.forEach(p => {
+            let zval = evalFuncSafe(funcStr, p.x, p.y);
+            let color = p.type === 'Maximum' ? '#dc2626' : (p.type === 'Minimum' ? '#10b981' : '#f97316');
+            markers.push({
+                x: [p.x], y: [p.y], z: [zval], mode: 'markers', type: 'scatter3d',
+                marker: { size: 7, color: color, symbol: 'circle' }, name: p.type
+            });
+        });
+        let layout = {
+            title: '3D Surface with Critical Points', scene: { camera: { eye: { x: 1.4, y: 1.3, z: 1.2 } } },
+            paper_bgcolor: '#fff'
+        };
+        Plotly.newPlot('surface3d', [surface, ...markers], layout, { responsive: true });
+    }
+
+    // ---------------------------- QUIZ ----------------------------
     const quizQuestions = [
         { q: "What is a necessary condition for (a,b) to be a critical point of f(x,y)?", options: ["f_x=0 and f_y=0", "f_xx=0", "f_xy=0", "f=0"], correct: 0, solution: "Both first partial derivatives must be zero." },
         { q: "If D > 0 and f_xx > 0 at a critical point, it is a:", options: ["Local maximum", "Local minimum", "Saddle point", "Inconclusive"], correct: 1, solution: "D>0 and f_xx>0 indicates local minimum." },
@@ -708,12 +852,12 @@
 
     function evaluateQuiz() {
         let score = 0;
-        for(let i=0; i<quizQuestions.length; i++) {
+        for (let i = 0; i < quizQuestions.length; i++) {
             let selected = document.querySelector(`input[name="q${i}"]:checked`);
             let isCorrect = selected && parseInt(selected.value) === quizQuestions[i].correct;
-            if(isCorrect) score++;
+            if (isCorrect) score++;
             let solutionDiv = document.getElementById(`sol${i}`);
-            if(!isCorrect) {
+            if (!isCorrect) {
                 solutionDiv.style.display = "block";
                 solutionDiv.innerHTML = `<button class="solution-btn" onclick="toggleSolution(${i})"><i class="fas fa-lightbulb"></i> View Detailed Solution</button>
                                          <div id="detailText${i}" style="display:none; margin-top:5px;">📖 <strong>Solution:</strong> ${quizQuestions[i].solution}</div>`;
@@ -722,59 +866,47 @@
                 solutionDiv.innerHTML = "";
             }
             let qDiv = document.getElementById(`q${i}`);
-            let existingStatus = qDiv.querySelector(".q-status");
-            if(existingStatus) existingStatus.remove();
-            let statusSpan = document.createElement("div");
-            statusSpan.className = "q-status";
-            statusSpan.style.fontSize="0.8rem"; statusSpan.style.marginTop="0.3rem";
-            statusSpan.innerHTML = isCorrect ? "✓ Correct" : "✗ Incorrect (click below for solution)";
-            statusSpan.style.color = isCorrect ? "#15803d" : "#b91c1c";
-            qDiv.appendChild(statusSpan);
+            let existing = qDiv.querySelector(".q-status");
+            if (existing) existing.remove();
+            let span = document.createElement("div");
+            span.className = "q-status";
+            span.style.fontSize = "0.8rem"; span.style.marginTop = "0.3rem";
+            span.innerHTML = isCorrect ? "✓ Correct" : "✗ Incorrect (click below for solution)";
+            span.style.color = isCorrect ? "#15803d" : "#b91c1c";
+            qDiv.appendChild(span);
         }
-        document.getElementById("quizResult").innerHTML = `<div class="quiz-score">Score: ${score} / ${quizQuestions.length}</div><p>${score===20?"Excellent mastery!": "Review incorrect answers and learn from solutions."}</p>`;
+        document.getElementById("quizResult").innerHTML = `<div class="quiz-score">Score: ${score} / ${quizQuestions.length}</div><p>${score===20 ? "Excellent mastery!" : "Review incorrect answers and learn from solutions."}</p>`;
     }
 
     window.toggleSolution = function(idx) {
         let detail = document.getElementById(`detailText${idx}`);
-        if(detail.style.display === "none") detail.style.display = "block";
+        if (detail.style.display === "none") detail.style.display = "block";
         else detail.style.display = "none";
     };
 
-    // -------------------- FEEDBACK EMAIL HANDLER --------------------
+    // ---------------------------- FEEDBACK EMAIL ----------------------------
     document.getElementById("submitFeedback")?.addEventListener("click", function() {
         let name = document.getElementById("feedbackName").value.trim();
         let email = document.getElementById("feedbackEmail").value.trim();
-        let message = document.getElementById("feedbackMessage").value.trim();
-
-        if(!message) {
-            document.getElementById("feedbackStatus").innerHTML = "<span style='color:#b91c1c;'>⚠️ Please enter a message before sending.</span>";
+        let msg = document.getElementById("feedbackMessage").value.trim();
+        if (!msg) {
+            document.getElementById("feedbackStatus").innerHTML = "<span style='color:#b91c1c;'>⚠️ Please enter a message.</span>";
             return;
         }
-
-        // Build email body
-        let body = "Feedback from Maxima-Minima Visualizer\n\n";
-        if(name) body += `Name: ${name}\n`;
-        if(email) body += `Email: ${email}\n`;
-        body += `\nMessage:\n${message}\n\n--\nSent from PCCOE Calculus Interactive Tool`;
-        
-        let subject = `Feedback from ${name || "Anonymous User"} - Maxima/Minima Tool`;
-        let mailtoLink = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        
-        // Open default email client
-        window.location.href = mailtoLink;
-        
-        // Show success message and clear form
-        document.getElementById("feedbackStatus").innerHTML = "<span style='color:#2d6a4f;'><i class='fas fa-check-circle'></i> Opening your email client... Please send the email to complete feedback.</span>";
-        // Clear form fields (optional, but user may want to keep for reference)
+        let body = `Feedback from Maxima-Minima Tool\n\n`;
+        if (name) body += `Name: ${name}\n`;
+        if (email) body += `Email: ${email}\n`;
+        body += `\nMessage:\n${msg}\n--\nSent from PCCOE Calculus Visualizer`;
+        let subject = `Feedback from ${name || "Anonymous User"}`;
+        window.location.href = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        document.getElementById("feedbackStatus").innerHTML = "<span style='color:#2d6a4f;'><i class='fas fa-check-circle'></i> Opening your email client... Please send.</span>";
         document.getElementById("feedbackMessage").value = "";
         document.getElementById("feedbackName").value = "";
         document.getElementById("feedbackEmail").value = "";
-        
-        setTimeout(() => {
-            document.getElementById("feedbackStatus").innerHTML = "";
-        }, 5000);
+        setTimeout(() => { document.getElementById("feedbackStatus").innerHTML = ""; }, 5000);
     });
 
+    // ---------------------------- EVENT LISTENERS ----------------------------
     document.getElementById("computeBtn").addEventListener("click", computeAll);
     document.getElementById("submitQuiz").addEventListener("click", evaluateQuiz);
     const tabs = document.querySelectorAll(".tab-btn");
@@ -786,7 +918,7 @@
             document.getElementById(`${target}-panel`).classList.add("active-panel");
             tabs.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            if(target === "quiz") buildQuiz();
+            if (target === "quiz") buildQuiz();
         });
     });
     setTimeout(() => { computeAll(); buildQuiz(); }, 100);
