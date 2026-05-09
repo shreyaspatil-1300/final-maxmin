@@ -11,7 +11,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* (Your original CSS - unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -404,9 +403,9 @@
                 <p><strong>Procedure:</strong> Find f'(x), solve f'(x)=0, check sign of f'(x) on both sides.</p>
                 <table>
                     <tr><th>Sign change of f'(x)</th><th>Nature</th></tr>
-                    <tr><td>+ → -</td><td>Local Maximum</td></tr>
-                    <tr><td>- → +</td><td>Local Minimum</td></tr>
-                    <tr><td>No change</td><td>Neither</td></tr>
+                    <tr>.html+ → -</td><td>Local Maximum</th><tr>
+                    <tr>.html- → +</th> <td>Local Minimum</td> </tr>
+                    <tr>.htmlNo change</th> <td>Neither</td> </tr>
                 </table>
 
                 <h3>6. Second Derivative Test</h3>
@@ -433,11 +432,11 @@
                 <h3>13. Maxima and Minima for Functions of Two Variables</h3>
                 <p>For f(x,y), find partial derivatives f_x = 0, f_y = 0. Compute D = f_xx f_yy - (f_xy)².</p>
                 <table>
-                    <tr><th>Condition</th><th>Nature</th></tr>
-                    <tr><td>D>0, f_xx>0</td><td>Minimum</td></tr>
-                    <tr><td>D>0, f_xx<0</td><td>Maximum</td></tr>
-                    <tr><td>D<0</td><td>Saddle Point</td></tr>
-                    <tr><td>D=0</td><td>Inconclusive</td></tr>
+                    <tr><th>Condition</th><th>Nature</th> </tr>
+                    <tr>.htmlD>0, f_xx>0</th> <td>Minimum</td> </tr>
+                    <tr>.htmlD>0, f_xx<0</th> <td>Maximum</td> </tr>
+                    <tr>.htmlD<0</th> <td>Saddle Point</td> </tr>
+                    <tr>.htmlD=0</th> <td>Inconclusive</td> </tr>
                 </table>
 
                 <h3>14. Optimization Problems</h3>
@@ -464,15 +463,15 @@
 
                 <h3>21. Quick Revision Table</h3>
                 <table>
-                    <tr><th>Concept</th><th>Condition</th></tr>
-                    <tr><td>Critical Point</td><td>f'(x)=0</td></tr>
-                    <tr><td>Increasing</td><td>f'(x)>0</td></tr>
-                    <tr><td>Decreasing</td><td>f'(x)<0</td></tr>
-                    <tr><td>Maximum (1st derivative)</td><td>+ → -</td></tr>
-                    <tr><td>Minimum (1st derivative)</td><td>- → +</td></tr>
-                    <tr><td>Concave Up</td><td>f''(x)>0</td></tr>
-                    <tr><td>Concave Down</td><td>f''(x)<0</td></tr>
-                    <tr><td>Inflection</td><td>f''(x)=0 with sign change</td></tr>
+                    <tr><th>Concept</th><th>Condition</th> </tr>
+                    <tr>.htmlCritical Point</th> <td>f'(x)=0</td> </tr>
+                    <tr>.htmlIncreasing</th> <td>f'(x)>0</td> </tr>
+                    <tr>.htmlDecreasing</th> <td>f'(x)<0</td> </tr>
+                    <tr>.htmlMaximum (1st derivative)</th> <td>+ → -</td> </tr>
+                    <tr>.htmlMinimum (1st derivative)</th> <td>- → +</td> </tr>
+                    <tr>.htmlConcave Up</th> <td>f''(x)>0</td> </tr>
+                    <tr>.htmlConcave Down</th> <td>f''(x)<0</td> </tr>
+                    <tr>.htmlInflection</th> <td>f''(x)=0 with sign change</td> </tr>
                 </table>
 
                 <h3>22. Conclusion</h3>
@@ -497,8 +496,8 @@
             <h2><i class="fas fa-edit"></i> Define f(x, y)</h2>
             <div class="input-group">
                 <label>Function (JavaScript math):</label>
-                <input type="text" id="functionInput" class="func-input" value="x^3 - 3*x">
-                <small>Use x and y. Single‑variable functions like x^3 - 3*x are also supported.</small>
+                <input type="text" id="functionInput" class="func-input" value="2*x^3 - 3*x^2 - 12*x + 5">
+                <small>Any function of x and y. Single‑variable polynomials are fully supported over a wide domain.</small>
             </div>
             <button class="calc-btn" id="computeBtn"><i class="fas fa-calculator"></i> Compute Critical Points</button>
             <div id="criticalPointsOutput" class="result-box">Click compute to analyze...</div>
@@ -566,11 +565,15 @@
 </div>
 
 <script>
-    // ---------------------------- EMAIL CONFIGURATION ----------------------------
-    const ADMIN_EMAIL = "your-email@example.com";   // <-- CHANGE THIS TO YOUR EMAIL
+    // ---------------------------- CONFIGURATION ----------------------------
+    const ADMIN_EMAIL = "your-email@example.com";   // <--- CHANGE THIS TO YOUR EMAIL
+    
+    // Domain for critical point search (expand if needed)
+    const DOMAIN_MIN = -10;
+    const DOMAIN_MAX = 10;
 
     // ---------------------------- GLOBAL STATE ----------------------------
-    let currentFuncStr = "x^3 - 3*x";
+    let currentFuncStr = "2*x^3 - 3*x^2 - 12*x + 5";
     let criticalPoints = [];
 
     // ---------------------------- HELPER FUNCTIONS ----------------------------
@@ -594,15 +597,13 @@
         } catch(e) { return NaN; }
     }
 
-    // Finite difference gradient (fallback)
     function gradFD(f, x, y, h=1e-6) {
         let fx = (f(x+h, y) - f(x-h, y)) / (2*h);
         let fy = (f(x, y+h) - f(x, y-h)) / (2*h);
         return [fx, fy];
     }
 
-    // Refine a critical point using gradient descent
-    function refinePoint(f, fxStr, fyStr, x0, y0, tol=1e-6, maxIter=30) {
+    function refinePoint2D(f, fxStr, fyStr, x0, y0, tol=1e-6, maxIter=30) {
         let x = x0, y = y0;
         for (let iter = 0; iter < maxIter; iter++) {
             let fx = evalDerivative(fxStr, x, y);
@@ -616,75 +617,95 @@
             let step = Math.min(0.1, norm * 0.5);
             x -= fx * step;
             y -= fy * step;
-            // clamp to reasonable range
-            x = Math.min(Math.max(x, -8), 8);
-            y = Math.min(Math.max(y, -8), 8);
+            x = Math.min(Math.max(x, DOMAIN_MIN), DOMAIN_MAX);
+            y = Math.min(Math.max(y, DOMAIN_MIN), DOMAIN_MAX);
         }
         return {x, y};
     }
 
-    // Check if function depends on a variable
+    // Check if a function depends on a variable using symbolic derivative
     function dependsOnVariable(funcStr, varName) {
         try {
             let deriv = getDerivativeString(funcStr, varName);
-            // if derivative simplifies to "0", then it does not depend on it
             if (deriv === "0") return false;
-            // also check numerically at a few points
-            let testF = compileFunction(funcStr);
-            if (!testF) return true;
-            let yVar = varName === 'y';
-            for (let t = -2; t <= 2; t+=2) {
-                let val1 = testF(t, t);
-                let val2 = testF(t + 0.5, t + 0.5);
-                if (Math.abs(val1 - val2) > 1e-8) return true;
+            // numeric test at a few points
+            let f = compileFunction(funcStr);
+            if (!f) return true;
+            for (let t = -5; t <= 5; t+=2.5) {
+                let a = varName === 'x' ? f(t, 0) : f(0, t);
+                let b = varName === 'x' ? f(t+1, 0) : f(0, t+1);
+                if (Math.abs(a - b) > 1e-8) return true;
             }
             return false;
         } catch(e) { return true; }
     }
 
-    // Main critical point finder – handles single-variable and two-variable cases
+    // Robust 1D root finder for f'(x) = 0
+    function findRoots1D(derivativeFunc, a, b, step=0.2) {
+        let roots = [];
+        // scan for sign changes
+        let xPrev = a;
+        let yPrev = derivativeFunc(xPrev);
+        for (let x = a + step; x <= b; x += step) {
+            let yCurr = derivativeFunc(x);
+            if (yPrev * yCurr < 0) {
+                // root in interval – use bisection
+                let left = xPrev, right = x;
+                for (let iter = 0; iter < 30; iter++) {
+                    let mid = (left + right) / 2;
+                    let yMid = derivativeFunc(mid);
+                    if (Math.abs(yMid) < 1e-8) {
+                        left = right = mid;
+                        break;
+                    }
+                    if (yPrev * yMid < 0) right = mid;
+                    else left = mid;
+                }
+                let root = (left + right) / 2;
+                roots.push(root);
+            }
+            // also check near zero directly
+            if (Math.abs(yCurr) < 0.05) {
+                // refine using Newton
+                let refined = x;
+                for (let iter = 0; iter < 10; iter++) {
+                    let dy = derivativeFunc(refined);
+                    if (Math.abs(dy) < 1e-8) break;
+                    let h = 1e-5;
+                    let ddy = (derivativeFunc(refined + h) - derivativeFunc(refined - h)) / (2*h);
+                    if (Math.abs(ddy) > 1e-8) refined -= dy / ddy;
+                    else refined -= dy * 0.1;
+                    if (refined < a || refined > b) break;
+                }
+                if (refined >= a && refined <= b) roots.push(refined);
+            }
+            xPrev = x; yPrev = yCurr;
+        }
+        // deduplicate
+        let unique = [];
+        for (let r of roots) {
+            let dup = unique.some(u => Math.abs(u - r) < 0.02);
+            if (!dup && isFinite(r)) unique.push(r);
+        }
+        return unique;
+    }
+
+    // Main critical point finder (handles 1D and 2D)
     function findCriticalPoints(funcStr, f_eval) {
-        // First, detect if function is independent of y
         let dependsOnY = dependsOnVariable(funcStr, 'y');
         let dependsOnX = dependsOnVariable(funcStr, 'x');
 
-        // If it depends only on x (single-variable problem)
+        // ---------- 1D: only x ----------
         if (!dependsOnY && dependsOnX) {
-            // Solve f_x = 0 in 1D
             let fxStr = getDerivativeString(funcStr, 'x');
             if (!fxStr) return [];
-            // We'll find roots numerically by scanning x
-            let xRoots = [];
-            for (let x = -5; x <= 5; x += 0.1) {
-                let val = evalDerivative(fxStr, x, 0);
-                if (Math.abs(val) < 0.05) {
-                    // refine root using Newton-like on f_x
-                    let refinedX = x;
-                    for (let iter = 0; iter < 10; iter++) {
-                        let fpx = evalDerivative(fxStr, refinedX, 0);
-                        if (Math.abs(fpx) < 1e-6) break;
-                        // approximate second derivative for Newton
-                        let h = 1e-5;
-                        let fpx2 = (evalDerivative(fxStr, refinedX+h, 0) - evalDerivative(fxStr, refinedX-h, 0)) / (2*h);
-                        if (Math.abs(fpx2) > 1e-8) refinedX -= fpx / fpx2;
-                        else refinedX -= fpx * 0.1;
-                    }
-                    xRoots.push(refinedX);
-                }
-            }
-            // deduplicate
-            let uniqueX = [];
-            for (let x of xRoots) {
-                let dup = uniqueX.some(u => Math.abs(u - x) < 0.05);
-                if (!dup && isFinite(x)) uniqueX.push(x);
-            }
-            // For each root, create a critical point (set y=0 for display)
-            let points = [];
+            let dfdx = (x) => evalDerivative(fxStr, x, 0);
+            let rootsX = findRoots1D(dfdx, DOMAIN_MIN, DOMAIN_MAX, 0.25);
             let r2Str = getDerivativeString(getDerivativeString(funcStr, 'x'), 'x');
-            for (let x of uniqueX) {
+            let points = [];
+            for (let x of rootsX) {
                 let r = evalDerivative(r2Str, x, 0);
-                let D = r * r; // dummy for 1D, but we set s=0, t=r (since no y dependence)
-                let type = (r > 0) ? "Minimum" : (r < 0) ? "Maximum" : "Inconclusive";
+                let type = (r > 1e-8) ? "Minimum" : (r < -1e-8) ? "Maximum" : "Inconclusive";
                 points.push({
                     x: x, y: 0,
                     r: r, s: 0, t: r,
@@ -694,35 +715,17 @@
             }
             return points;
         }
-        // If depends only on y (similar)
+        // ---------- 1D: only y ----------
         else if (!dependsOnX && dependsOnY) {
             let fyStr = getDerivativeString(funcStr, 'y');
-            let yRoots = [];
-            for (let y = -5; y <= 5; y += 0.1) {
-                let val = evalDerivative(fyStr, 0, y);
-                if (Math.abs(val) < 0.05) {
-                    let refinedY = y;
-                    for (let iter = 0; iter < 10; iter++) {
-                        let fpy = evalDerivative(fyStr, 0, refinedY);
-                        if (Math.abs(fpy) < 1e-6) break;
-                        let h = 1e-5;
-                        let fpy2 = (evalDerivative(fyStr, 0, refinedY+h) - evalDerivative(fyStr, 0, refinedY-h)) / (2*h);
-                        if (Math.abs(fpy2) > 1e-8) refinedY -= fpy / fpy2;
-                        else refinedY -= fpy * 0.1;
-                    }
-                    yRoots.push(refinedY);
-                }
-            }
-            let uniqueY = [];
-            for (let y of yRoots) {
-                let dup = uniqueY.some(u => Math.abs(u - y) < 0.05);
-                if (!dup && isFinite(y)) uniqueY.push(y);
-            }
+            if (!fyStr) return [];
+            let dfdy = (y) => evalDerivative(fyStr, 0, y);
+            let rootsY = findRoots1D(dfdy, DOMAIN_MIN, DOMAIN_MAX, 0.25);
             let t2Str = getDerivativeString(getDerivativeString(funcStr, 'y'), 'y');
             let points = [];
-            for (let y of uniqueY) {
+            for (let y of rootsY) {
                 let t = evalDerivative(t2Str, 0, y);
-                let type = (t > 0) ? "Minimum" : (t < 0) ? "Maximum" : "Inconclusive";
+                let type = (t > 1e-8) ? "Minimum" : (t < -1e-8) ? "Maximum" : "Inconclusive";
                 points.push({
                     x: 0, y: y,
                     r: t, s: 0, t: t,
@@ -732,23 +735,23 @@
             }
             return points;
         }
-        // Two-variable case: standard grid search
+        // ---------- 2D case ----------
         let fxStr = getDerivativeString(funcStr, 'x');
         let fyStr = getDerivativeString(funcStr, 'y');
         if (!fxStr || !fyStr) return [];
 
         let candidates = [];
-        let step = 0.22;
-        for (let x = -5; x <= 5; x += step) {
-            for (let y = -5; y <= 5; y += step) {
+        let step = 0.35;  // coarse grid
+        for (let x = DOMAIN_MIN; x <= DOMAIN_MAX; x += step) {
+            for (let y = DOMAIN_MIN; y <= DOMAIN_MAX; y += step) {
                 let fx = evalDerivative(fxStr, x, y);
                 let fy = evalDerivative(fyStr, x, y);
                 if (isNaN(fx) || isNaN(fy)) {
                     let [gx, gy] = gradFD(f_eval, x, y);
                     fx = gx; fy = gy;
                 }
-                if (Math.abs(fx) < 0.1 && Math.abs(fy) < 0.1) {
-                    let refined = refinePoint(f_eval, fxStr, fyStr, x, y);
+                if (Math.abs(fx) < 0.15 && Math.abs(fy) < 0.15) {
+                    let refined = refinePoint2D(f_eval, fxStr, fyStr, x, y);
                     candidates.push(refined);
                 }
             }
@@ -756,11 +759,10 @@
         // deduplicate
         let unique = [];
         for (let c of candidates) {
-            let dup = unique.some(u => Math.hypot(u.x - c.x, u.y - c.y) < 0.1);
+            let dup = unique.some(u => Math.hypot(u.x - c.x, u.y - c.y) < 0.15);
             if (!dup && isFinite(c.x) && isFinite(c.y)) unique.push(c);
         }
 
-        // second derivatives for classification
         let r2Str = getDerivativeString(getDerivativeString(funcStr, 'x'), 'x');
         let s2Str = getDerivativeString(getDerivativeString(funcStr, 'x'), 'y');
         let t2Str = getDerivativeString(getDerivativeString(funcStr, 'y'), 'y');
@@ -770,7 +772,6 @@
             let s = evalDerivative(s2Str, p.x, p.y);
             let t = evalDerivative(t2Str, p.x, p.y);
             if (isNaN(r) || isNaN(s) || isNaN(t)) {
-                // fallback finite differences
                 let h = 1e-5;
                 let f = f_eval;
                 let fxx = (f(p.x+h, p.y) - 2*f(p.x, p.y) + f(p.x-h, p.y)) / (h*h);
@@ -805,7 +806,6 @@
         let points = findCriticalPoints(currentFuncStr, f);
         criticalPoints = points;
 
-        // Show symbolic second derivatives
         let r2 = getDerivativeString(getDerivativeString(currentFuncStr, 'x'), 'x');
         let s2 = getDerivativeString(getDerivativeString(currentFuncStr, 'x'), 'y');
         let t2 = getDerivativeString(getDerivativeString(currentFuncStr, 'y'), 'y');
@@ -816,7 +816,7 @@
         D = r·t − s² (evaluated at each critical point)`;
 
         if (criticalPoints.length === 0) {
-            document.getElementById("criticalPointsOutput").innerHTML = "⚠️ No critical points found. Try a different function.";
+            document.getElementById("criticalPointsOutput").innerHTML = "⚠️ No critical points found. Try a different function or check domain.";
         } else {
             let html = `<strong>🔍 Critical points (${criticalPoints.length} found):</strong><br>`;
             criticalPoints.forEach(p => {
@@ -846,11 +846,11 @@
         }
         document.getElementById("analysisSummary").innerHTML = summary;
 
-        let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th></tr>`;
+        let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th> </tr>`;
         points.forEach(p => {
             tableHtml += `<tr><td>(${p.x.toFixed(4)}, ${p.y.toFixed(4)})</td>
-                          <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
-                          <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
+                           <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
+                           <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
         });
         tableHtml += `</table>`;
         if (points.length === 0) tableHtml = "<i>No critical points data available</i>";
@@ -859,8 +859,9 @@
 
     function updateContourPlot(funcStr, points) {
         let xv = [], yv = [], zv = [];
-        for (let x = -3; x <= 3.01; x += 0.2) {
-            for (let y = -3; y <= 3.01; y += 0.2) {
+        let lim = Math.min(5, Math.max(3, Math.abs(DOMAIN_MAX)*0.6));
+        for (let x = -lim; x <= lim; x += 0.2) {
+            for (let y = -lim; y <= lim; y += 0.2) {
                 let z = evalFuncSafe(funcStr, x, y);
                 if (isFinite(z)) { xv.push(x); yv.push(y); zv.push(z); }
             }
@@ -881,7 +882,7 @@
 
     function update3DSurface(funcStr, points) {
         let xa = [], ya = [], zmat = [];
-        let steps = 50, rng = [-2.5, 2.5];
+        let steps = 55, rng = [-2.8, 2.8];
         for (let i = 0; i <= steps; i++) {
             let x = rng[0] + (i / steps) * (rng[1] - rng[0]);
             let row = [];
