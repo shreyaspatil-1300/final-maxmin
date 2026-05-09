@@ -11,6 +11,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* ========== YOUR ORIGINAL CSS (unchanged) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -369,10 +370,10 @@
         <button class="tab-btn" data-panel="feedback"><i class="fas fa-comment-dots"></i> Feedback</button>
     </div>
 
-    <!-- ==================== HOME PANEL ==================== -->
+    <!-- ==================== HOME PANEL - THEORY (FULLY CORRECTED) ==================== -->
     <div id="home-panel" class="panel active-panel">
         <div class="card">
-            <h2><i class="fas fa-book-open"></i> Maxima and Minima </h2>
+            <h2><i class="fas fa-book-open"></i> Maxima and Minima – Complete Theory</h2>
             <div class="theory-content">
                 <h3>Introduction</h3>
                 <p>Maxima and Minima is an important topic in Differential Calculus that deals with finding the greatest and smallest values of a function. These concepts are widely used in mathematics, physics, engineering, economics, optimization problems, and real-life applications.</p>
@@ -402,10 +403,14 @@
                 <h3>5. First Derivative Test</h3>
                 <p><strong>Procedure:</strong> Find f'(x), solve f'(x)=0, check sign of f'(x) on both sides.</p>
                 <table>
-                    <tr><th>Sign change of f'(x)</th><th>Nature</th></tr>
-                    <tr>.html+ → -</td><td>Local Maximum</th><tr>
-                    <tr>.html- → +</th> <td>Local Minimum</td> </tr>
-                    <tr>.htmlNo change</th> <td>Neither</td> </tr>
+                    <thead>
+                        <tr><th>Sign change of f'(x)</th><th>Nature of Point</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>+ → -</td><td>Local Maximum</td>｜｜DSML｜｜
+                        <tr><td>- → +</td><td>Local Minimum</td></tr>
+                        <tr><td>No sign change</td><td>Neither (inflection point)</td></tr>
+                    </tbody>
                 </table>
 
                 <h3>6. Second Derivative Test</h3>
@@ -432,11 +437,15 @@
                 <h3>13. Maxima and Minima for Functions of Two Variables</h3>
                 <p>For f(x,y), find partial derivatives f_x = 0, f_y = 0. Compute D = f_xx f_yy - (f_xy)².</p>
                 <table>
-                    <tr><th>Condition</th><th>Nature</th> </tr>
-                    <tr>.htmlD>0, f_xx>0</th> <td>Minimum</td> </tr>
-                    <tr>.htmlD>0, f_xx<0</th> <td>Maximum</td> </tr>
-                    <tr>.htmlD<0</th> <td>Saddle Point</td> </tr>
-                    <tr>.htmlD=0</th> <td>Inconclusive</td> </tr>
+                    <thead>
+                        <tr><th>Condition</th><th>Nature</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>D > 0 and f_xx > 0</td><td>Local Minimum</td></tr>
+                        <tr><td>D > 0 and f_xx < 0</td><td>Local Maximum</td></tr>
+                        <tr><td>D < 0</td><td>Saddle Point</td></tr>
+                        <tr><td>D = 0</td><td>Inconclusive</td></tr>
+                    </tbody>
                 </table>
 
                 <h3>14. Optimization Problems</h3>
@@ -463,15 +472,19 @@
 
                 <h3>21. Quick Revision Table</h3>
                 <table>
-                    <tr><th>Concept</th><th>Condition</th> </tr>
-                    <tr>.htmlCritical Point</th> <td>f'(x)=0</td> </tr>
-                    <tr>.htmlIncreasing</th> <td>f'(x)>0</td> </tr>
-                    <tr>.htmlDecreasing</th> <td>f'(x)<0</td> </tr>
-                    <tr>.htmlMaximum (1st derivative)</th> <td>+ → -</td> </tr>
-                    <tr>.htmlMinimum (1st derivative)</th> <td>- → +</td> </tr>
-                    <tr>.htmlConcave Up</th> <td>f''(x)>0</td> </tr>
-                    <tr>.htmlConcave Down</th> <td>f''(x)<0</td> </tr>
-                    <tr>.htmlInflection</th> <td>f''(x)=0 with sign change</td> </tr>
+                    <thead>
+                        <tr><th>Concept</th><th>Condition</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Critical Point</td><td>f'(x)=0</td></tr>
+                        <tr><td>Increasing Function</td><td>f'(x)>0</td></tr>
+                        <tr><td>Decreasing Function</td><td>f'(x)<0</td></tr>
+                        <tr><td>Maximum (1st derivative)</td><td>+ → -</td></tr>
+                        <tr><td>Minimum (1st derivative)</td><td>- → +</td></tr>
+                        <tr><td>Concave Up</td><td>f''(x)>0</td></tr>
+                        <tr><td>Concave Down</td><td>f''(x)<0</td></tr>
+                        <tr><td>Point of Inflection</td><td>f''(x)=0 with sign change</td></tr>
+                    </tbody>
                 </table>
 
                 <h3>22. Conclusion</h3>
@@ -479,6 +492,7 @@
             </div>
         </div>
         
+        <!-- YouTube Video -->
         <div class="card">
             <div class="video-wrapper">
                 <h3><i class="fab fa-youtube"></i> One Shot Video: Maxima & Minima (Full Revision)</h3>
@@ -521,7 +535,7 @@
         </div>
     </div>
 
-    <!-- ==================== 3D VISUALIZER ==================== -->
+    <!-- ==================== 3D VISUALIZER PANEL ==================== -->
     <div id="visuals-panel" class="panel">
         <div class="card">
             <h2>Interactive 3D Surface</h2>
@@ -623,12 +637,10 @@
         return {x, y};
     }
 
-    // Check if a function depends on a variable using symbolic derivative
     function dependsOnVariable(funcStr, varName) {
         try {
             let deriv = getDerivativeString(funcStr, varName);
             if (deriv === "0") return false;
-            // numeric test at a few points
             let f = compileFunction(funcStr);
             if (!f) return true;
             for (let t = -5; t <= 5; t+=2.5) {
@@ -640,16 +652,13 @@
         } catch(e) { return true; }
     }
 
-    // Robust 1D root finder for f'(x) = 0
     function findRoots1D(derivativeFunc, a, b, step=0.2) {
         let roots = [];
-        // scan for sign changes
         let xPrev = a;
         let yPrev = derivativeFunc(xPrev);
         for (let x = a + step; x <= b; x += step) {
             let yCurr = derivativeFunc(x);
             if (yPrev * yCurr < 0) {
-                // root in interval – use bisection
                 let left = xPrev, right = x;
                 for (let iter = 0; iter < 30; iter++) {
                     let mid = (left + right) / 2;
@@ -664,9 +673,7 @@
                 let root = (left + right) / 2;
                 roots.push(root);
             }
-            // also check near zero directly
             if (Math.abs(yCurr) < 0.05) {
-                // refine using Newton
                 let refined = x;
                 for (let iter = 0; iter < 10; iter++) {
                     let dy = derivativeFunc(refined);
@@ -681,7 +688,6 @@
             }
             xPrev = x; yPrev = yCurr;
         }
-        // deduplicate
         let unique = [];
         for (let r of roots) {
             let dup = unique.some(u => Math.abs(u - r) < 0.02);
@@ -690,12 +696,10 @@
         return unique;
     }
 
-    // Main critical point finder (handles 1D and 2D)
     function findCriticalPoints(funcStr, f_eval) {
         let dependsOnY = dependsOnVariable(funcStr, 'y');
         let dependsOnX = dependsOnVariable(funcStr, 'x');
 
-        // ---------- 1D: only x ----------
         if (!dependsOnY && dependsOnX) {
             let fxStr = getDerivativeString(funcStr, 'x');
             if (!fxStr) return [];
@@ -715,7 +719,6 @@
             }
             return points;
         }
-        // ---------- 1D: only y ----------
         else if (!dependsOnX && dependsOnY) {
             let fyStr = getDerivativeString(funcStr, 'y');
             if (!fyStr) return [];
@@ -735,13 +738,13 @@
             }
             return points;
         }
-        // ---------- 2D case ----------
+        // 2D case
         let fxStr = getDerivativeString(funcStr, 'x');
         let fyStr = getDerivativeString(funcStr, 'y');
         if (!fxStr || !fyStr) return [];
 
         let candidates = [];
-        let step = 0.35;  // coarse grid
+        let step = 0.35;
         for (let x = DOMAIN_MIN; x <= DOMAIN_MAX; x += step) {
             for (let y = DOMAIN_MIN; y <= DOMAIN_MAX; y += step) {
                 let fx = evalDerivative(fxStr, x, y);
@@ -756,7 +759,6 @@
                 }
             }
         }
-        // deduplicate
         let unique = [];
         for (let c of candidates) {
             let dup = unique.some(u => Math.hypot(u.x - c.x, u.y - c.y) < 0.15);
@@ -846,11 +848,11 @@
         }
         document.getElementById("analysisSummary").innerHTML = summary;
 
-        let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th> </tr>`;
+        let tableHtml = `<table style="width:100%; border-collapse:collapse;"><tr style="background:#eef2ff;"><th>Point (x,y)</th><th>r = f_xx</th><th>s = f_xy</th><th>t = f_yy</th><th>D = rt-s²</th><th>Classification</th></tr>`;
         points.forEach(p => {
             tableHtml += `<tr><td>(${p.x.toFixed(4)}, ${p.y.toFixed(4)})</td>
-                           <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
-                           <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
+                          <td>${p.r.toFixed(5)}</td><td>${p.s.toFixed(5)}</td><td>${p.t.toFixed(5)}</td>
+                          <td>${p.D.toFixed(5)}</td><td><strong>${p.type}</strong></td></tr>`;
         });
         tableHtml += `</table>`;
         if (points.length === 0) tableHtml = "<i>No critical points data available</i>";
@@ -914,7 +916,7 @@
         Plotly.newPlot('surface3d', [surface, ...markers], layout, { responsive: true });
     }
 
-    // ---------------------------- QUIZ (unchanged) ----------------------------
+    // ---------------------------- QUIZ ----------------------------
     const quizQuestions = [
         { q: "What is a necessary condition for (a,b) to be a critical point of f(x,y)?", options: ["f_x=0 and f_y=0", "f_xx=0", "f_xy=0", "f=0"], correct: 0, solution: "Both first partial derivatives must be zero." },
         { q: "If D > 0 and f_xx > 0 at a critical point, it is a:", options: ["Local maximum", "Local minimum", "Saddle point", "Inconclusive"], correct: 1, solution: "D>0 and f_xx>0 indicates local minimum." },
